@@ -70,18 +70,18 @@
     "@typescript-eslint/parser": "^5.62.0",
     "@vitest/ui": "^3.1.1",
     "cross-env": "^7.0.3",
-    "drizzle-kit": "^0.30.6",
+    "drizzle-kit": "^0.31.5",
     "electron": "38.2.2",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.31.0",
-    "happy-dom": "^17.4.4",
+    "happy-dom": "^20.0.2",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "oxlint": "^1.8.0",
     "prettier": "3.5.3",
     "rimraf": "^6.0.1",
     "typescript": "^5.8.3",
-    "vite": "^5.4.17",
+    "vite": "^7.1.10",
     "vitest": "^3.1.1"
   },
   "dependencies": {
@@ -176,6 +176,7 @@
   "overrides": {
     "@vercel/sdk": {
       "@modelcontextprotocol/sdk": "$@modelcontextprotocol/sdk"
-    }
+    },
+    "esbuild": "^0.25.9"
   }
 }
