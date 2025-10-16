@@ -222,3 +222,98 @@ export const mcpToolConsents = sqliteTable(
   },
   (table) => [unique("uniq_mcp_consent").on(table.serverId, table.toolName)],
 );
+
+// --- AI Collaboration Mode System tables ---
+export const aiCollaborationModes = sqliteTable("ai_collaboration_modes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  // Mode type: 'inspired' | 'didactic' | 'parallel'
+  mode: text("mode").notNull(),
+  // Active state - only one mode can be active at a time
+  isActive: integer("is_active", { mode: "boolean" })
+    .notNull()
+    .default(sql`0`),
+  // Mode-specific configuration stored as JSON
+  configuration: text("configuration", { mode: "json" }).$type<Record<
+    string,
+    any
+  > | null>(),
+  // Timestamps
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  lastActivatedAt: integer("last_activated_at", { mode: "timestamp" }),
+});
+
+export const modeTransitionHistory = sqliteTable("mode_transition_history", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  fromMode: text("from_mode"),
+  toMode: text("to_mode").notNull(),
+  // Preserved context snapshot as JSON
+  contextSnapshot: text("context_snapshot", { mode: "json" }).$type<Record<
+    string,
+    any
+  > | null>(),
+  transitionDuration: integer("transition_duration"), // in milliseconds
+  success: integer("success", { mode: "boolean" })
+    .notNull()
+    .default(sql`1`),
+  errorMessage: text("error_message"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+export const modeCapabilities = sqliteTable("mode_capabilities", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  mode: text("mode").notNull().unique(),
+  // Capability flags
+  localAI: integer("local_ai", { mode: "boolean" })
+    .notNull()
+    .default(sql`0`),
+  externalAI: integer("external_ai", { mode: "boolean" })
+    .notNull()
+    .default(sql`0`),
+  multiChannel: integer("multi_channel", { mode: "boolean" })
+    .notNull()
+    .default(sql`0`),
+  offlineCapable: integer("offline_capable", { mode: "boolean" })
+    .notNull()
+    .default(sql`0`),
+  realTimeSync: integer("real_time_sync", { mode: "boolean" })
+    .notNull()
+    .default(sql`0`),
+  // Associated MCP servers for this mode (JSON array of server IDs)
+  mcpServerIds: text("mcp_server_ids", { mode: "json" }).$type<
+    number[] | null
+  >(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+// Define relations for mode tables
+export const aiCollaborationModesRelations = relations(
+  aiCollaborationModes,
+  ({ one }) => ({
+    capabilities: one(modeCapabilities, {
+      fields: [aiCollaborationModes.mode],
+      references: [modeCapabilities.mode],
+    }),
+  }),
+);
+
+export const modeCapabilitiesRelations = relations(
+  modeCapabilities,
+  ({ one }) => ({
+    mode: one(aiCollaborationModes, {
+      fields: [modeCapabilities.mode],
+      references: [aiCollaborationModes.mode],
+    }),
+  }),
+);

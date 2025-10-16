@@ -68,6 +68,13 @@ import type {
   CloneRepoParams,
   SupabaseBranch,
   SetSupabaseAppProjectParams,
+  AICollaborationMode,
+  ModeStateSnapshot,
+  AICollaborationModeStatus,
+  SwitchModeParams,
+  SwitchModeResult,
+  UpdateModeConfigurationParams,
+  ModeTransitionRecord,
 } from "./ipc_types";
 import type { Template } from "../shared/templates";
 import type {
@@ -1279,6 +1286,34 @@ export class IpcClient {
   public async deletePrompt(id: number): Promise<void> {
     await this.ipcRenderer.invoke("prompts:delete", id);
   }
+
+  // --- AI Collaboration Mode System ---
+  public async getModeState(): Promise<ModeStateSnapshot> {
+    return this.ipcRenderer.invoke("mode:get-state");
+  }
+
+  public async getModeStatus(
+    mode: AICollaborationMode,
+  ): Promise<AICollaborationModeStatus | null> {
+    return this.ipcRenderer.invoke("mode:get-mode-status", mode);
+  }
+
+  public async switchMode(params: SwitchModeParams): Promise<SwitchModeResult> {
+    return this.ipcRenderer.invoke("mode:switch-mode", params);
+  }
+
+  public async updateModeConfiguration(
+    params: UpdateModeConfigurationParams,
+  ): Promise<AICollaborationModeStatus> {
+    return this.ipcRenderer.invoke("mode:update-configuration", params);
+  }
+
+  public async getModeTransitionHistory(
+    limit?: number,
+  ): Promise<ModeTransitionRecord[]> {
+    return this.ipcRenderer.invoke("mode:get-transition-history", limit);
+  }
+
   public async cloneRepoFromUrl(
     params: CloneRepoParams,
   ): Promise<{ app: App; hasAiRules: boolean } | { error: string }> {
