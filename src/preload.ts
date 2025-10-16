@@ -128,6 +128,12 @@ const validInvokeChannels = [
   "prompts:create",
   "prompts:update",
   "prompts:delete",
+  // AI Collaboration Modes
+  "mode:get-state",
+  "mode:get-mode-status",
+  "mode:switch-mode",
+  "mode:update-configuration",
+  "mode:get-transition-history",
   // adding app to favorite
   "add-to-favorite",
   "github:clone-repo-from-url",

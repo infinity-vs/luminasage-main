@@ -523,3 +523,57 @@ export interface SetSupabaseAppProjectParams {
   parentProjectId?: string;
   appId: number;
 }
+
+// --- AI Collaboration Mode System ---
+export type AICollaborationMode = "inspired" | "didactic" | "parallel";
+
+export interface ModeCapabilityDescriptor {
+  mode: AICollaborationMode;
+  localAI: boolean;
+  externalAI: boolean;
+  multiChannel: boolean;
+  offlineCapable: boolean;
+  realTimeSync: boolean;
+  mcpServerIds?: number[];
+}
+
+export interface AICollaborationModeStatus {
+  mode: AICollaborationMode;
+  isActive: boolean;
+  lastActivatedAt: string | null;
+  configuration?: Record<string, unknown> | null;
+  capabilities: ModeCapabilityDescriptor;
+}
+
+export interface ModeStateSnapshot {
+  currentMode: AICollaborationMode;
+  previousMode: AICollaborationMode | null;
+  availableModes: AICollaborationModeStatus[];
+  modeHistory: ModeTransitionRecord[];
+}
+
+export interface ModeTransitionRecord {
+  id: number;
+  fromMode: AICollaborationMode | null;
+  toMode: AICollaborationMode;
+  transitionDuration: number | null;
+  success: boolean;
+  errorMessage: string | null;
+  createdAt: string;
+}
+
+export interface SwitchModeParams {
+  targetMode: AICollaborationMode;
+  contextSnapshot?: Record<string, unknown> | null;
+}
+
+export interface SwitchModeResult {
+  mode: AICollaborationModeStatus;
+  transition: ModeTransitionRecord;
+  preservedContext?: Record<string, unknown> | null;
+}
+
+export interface UpdateModeConfigurationParams {
+  mode: AICollaborationMode;
+  configuration: Record<string, unknown> | null;
+}
