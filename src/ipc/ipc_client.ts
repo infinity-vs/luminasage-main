@@ -85,6 +85,8 @@ import type {
   ParallelModeStrategy,
   AISource,
   McpCoordinatorStatus,
+  DistributedMemoryStatus,
+  DistributedMemoryConfig,
 } from "./ipc_types";
 import type { Template } from "../shared/templates";
 import type {
@@ -1373,6 +1375,56 @@ export class IpcClient {
 
   public async getMcpCoordinatorStatus(): Promise<McpCoordinatorStatus> {
     return this.ipcRenderer.invoke("mode:parallel:get-mcp-coordinator-status");
+  }
+
+  // --- Distributed Memory Methods ---
+  public async initializeDistributedMemory(
+    config: DistributedMemoryConfig,
+  ): Promise<void> {
+    return this.ipcRenderer.invoke("distributed:initialize", config);
+  }
+
+  public async getDistributedMemoryStatus(): Promise<DistributedMemoryStatus> {
+    return this.ipcRenderer.invoke("distributed:get-status");
+  }
+
+  public async shutdownDistributedMemory(): Promise<void> {
+    return this.ipcRenderer.invoke("distributed:shutdown");
+  }
+
+  public async publishModeChange(params: {
+    userId: string;
+    fromMode: "inspired" | "didactic" | "parallel" | null;
+    toMode: "inspired" | "didactic" | "parallel";
+    configuration?: Record<string, unknown>;
+  }): Promise<void> {
+    return this.ipcRenderer.invoke("distributed:publish-mode-change", params);
+  }
+
+  public async publishContextUpdate(params: {
+    userId: string;
+    contextKey: string;
+    contextType: "chat" | "project" | "mode" | "custom";
+    data: Record<string, unknown>;
+  }): Promise<void> {
+    return this.ipcRenderer.invoke("distributed:publish-context-update", params);
+  }
+
+  public async storeResponseSource(params: {
+    userId: string;
+    chatId: number;
+    messageId: number;
+    mode: "inspired" | "didactic" | "parallel";
+    source: {
+      sourceType: "local" | "external" | "harmonized";
+      provider: string;
+      model: string;
+      confidence?: number;
+      metadata?: Record<string, unknown>;
+    };
+    responseHash: string;
+  }): Promise<void> {
+    return this.ipcRenderer.invoke("distributed:store-response-source", params);
   }
 
   public async cloneRepoFromUrl(

@@ -149,6 +149,13 @@ const validInvokeChannels = [
   "mode:parallel:get-strategy",
   "mode:parallel:get-sources",
   "mode:parallel:get-mcp-coordinator-status",
+  // Distributed Memory
+  "distributed:initialize",
+  "distributed:get-status",
+  "distributed:shutdown",
+  "distributed:publish-mode-change",
+  "distributed:publish-context-update",
+  "distributed:store-response-source",
   // adding app to favorite
   "add-to-favorite",
   "github:clone-repo-from-url",

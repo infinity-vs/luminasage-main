@@ -1,0 +1,118 @@
+# Docker Compose for Dyad Distributed Memory Systems
+# 
+# This compose file sets up MongoDB and Redis for distributed
+# AI collaboration mode synchronization.
+#
+# Usage:
+#   docker-compose -f docker-compose.distributed.yml up -d
+#   docker-compose -f docker-compose.distributed.yml down
+
+version: '3.8'
+
+services:
+  # MongoDB for persistent distributed state
+  mongodb:
+    image: mongo:7
+    container_name: dyad-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=dyad_distributed
+    volumes:
+      - dyad-mongo-data:/data/db
+      - dyad-mongo-config:/data/configdb
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/dyad_distributed --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - dyad-network
+
+  # Redis for event bus and pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: dyad-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - dyad-redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    networks:
+      - dyad-network
+
+  # Optional: Redis Commander (Web UI for Redis)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: dyad-redis-commander
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=local:dyad-redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - dyad-network
+    profiles:
+      - tools
+
+  # Optional: Mongo Express (Web UI for MongoDB)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: dyad-mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://dyad-mongodb:27017/
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+    networks:
+      - dyad-network
+    profiles:
+      - tools
+
+volumes:
+  dyad-mongo-data:
+    driver: local
+  dyad-mongo-config:
+    driver: local
+  dyad-redis-data:
+    driver: local
+
+networks:
+  dyad-network:
+    driver: bridge
+
+# Usage:
+# 
+# Start services:
+#   docker-compose -f docker-compose.distributed.yml up -d
+# 
+# Start with management tools:
+#   docker-compose -f docker-compose.distributed.yml --profile tools up -d
+# 
+# View logs:
+#   docker-compose -f docker-compose.distributed.yml logs -f
+# 
+# Stop services:
+#   docker-compose -f docker-compose.distributed.yml down
+# 
+# Stop and remove data:
+#   docker-compose -f docker-compose.distributed.yml down -v
+# 
+# Access management tools (when using --profile tools):
+#   MongoDB UI: http://localhost:8082 (admin/admin)
+#   Redis UI:   http://localhost:8081

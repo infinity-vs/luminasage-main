@@ -655,3 +655,41 @@ export interface McpCoordinatorStatus {
   totalTools: number;
   isReady: boolean;
 }
+
+// --- Distributed Memory Types ---
+export interface DistributedMemoryStatus {
+  mongodb: {
+    enabled: boolean;
+    connected: boolean;
+    healthy: boolean;
+  };
+  redis: {
+    enabled: boolean;
+    connected: boolean;
+    healthy: boolean;
+  };
+  websocket: {
+    enabled: boolean;
+    running: boolean;
+    clientCount: number;
+  };
+  instanceId: string;
+  isFullyOperational: boolean;
+}
+
+export interface DistributedMemoryConfig {
+  mongodb?: {
+    url: string;
+    database: string;
+  };
+  redis?: {
+    url: string;
+  };
+  websocket?: {
+    port: number;
+  };
+  userId: string;
+  enableMongoDB?: boolean;
+  enableRedis?: boolean;
+  enableWebSocket?: boolean;
+}
