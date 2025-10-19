@@ -3,8 +3,10 @@ import { ModelPicker } from "./ModelPicker";
 import { ProModeSelector } from "./ProModeSelector";
 import { ChatModeSelector } from "./ChatModeSelector";
 import { AICollaborationModeSelector } from "./AICollaborationModeSelector";
+import { InspiredModeIndicator } from "./InspiredModeIndicator";
 import { McpToolsPicker } from "@/components/McpToolsPicker";
 import { useSettings } from "@/hooks/useSettings";
+import { useAICollaborationMode } from "@/hooks/useAICollaborationMode";
 
 export function ChatInputControls({
   showContextFilesPicker = false,
@@ -12,10 +14,17 @@ export function ChatInputControls({
   showContextFilesPicker?: boolean;
 }) {
   const { settings } = useSettings();
+  const { currentMode } = useAICollaborationMode();
 
   return (
     <div className="flex items-center gap-1.5">
       <AICollaborationModeSelector />
+      {currentMode === "inspired" && (
+        <>
+          <InspiredModeIndicator />
+          <div className="w-1"></div>
+        </>
+      )}
       <ChatModeSelector />
       {settings?.selectedChatMode === "agent" && (
         <>

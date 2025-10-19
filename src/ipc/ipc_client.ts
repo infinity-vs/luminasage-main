@@ -75,6 +75,8 @@ import type {
   SwitchModeResult,
   UpdateModeConfigurationParams,
   ModeTransitionRecord,
+  InspiredModeStatus,
+  InspiredModeValidation,
 } from "./ipc_types";
 import type { Template } from "../shared/templates";
 import type {
@@ -1312,6 +1314,19 @@ export class IpcClient {
     limit?: number,
   ): Promise<ModeTransitionRecord[]> {
     return this.ipcRenderer.invoke("mode:get-transition-history", limit);
+  }
+
+  // --- Inspired Mode Specific Methods ---
+  public async getInspiredModeStatus(): Promise<InspiredModeStatus> {
+    return this.ipcRenderer.invoke("mode:inspired:get-status");
+  }
+
+  public async validateInspiredMode(): Promise<InspiredModeValidation> {
+    return this.ipcRenderer.invoke("mode:inspired:validate");
+  }
+
+  public async getRecommendedOllamaModel(): Promise<string | null> {
+    return this.ipcRenderer.invoke("mode:inspired:get-recommended-model");
   }
 
   public async cloneRepoFromUrl(

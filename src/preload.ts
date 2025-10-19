@@ -134,6 +134,10 @@ const validInvokeChannels = [
   "mode:switch-mode",
   "mode:update-configuration",
   "mode:get-transition-history",
+  // Inspired Mode
+  "mode:inspired:get-status",
+  "mode:inspired:validate",
+  "mode:inspired:get-recommended-model",
   // adding app to favorite
   "add-to-favorite",
   "github:clone-repo-from-url",

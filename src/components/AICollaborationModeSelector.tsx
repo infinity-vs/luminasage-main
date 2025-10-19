@@ -11,17 +11,34 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAICollaborationMode } from "@/hooks/useAICollaborationMode";
+import { useInspiredMode } from "@/hooks/useInspiredMode";
 import type { AICollaborationMode } from "@/ipc/ipc_types";
 import { cn } from "@/lib/utils";
-import { Sparkles, BookOpen, Zap } from "lucide-react";
+import { Sparkles, BookOpen, Zap, AlertCircle } from "lucide-react";
+import { showError } from "@/lib/toast";
 
 export function AICollaborationModeSelector() {
   const { currentMode, availableModes, switchMode, isSwitching } =
     useAICollaborationMode();
+  const { canActivate: canActivateInspired, validationReason } =
+    useInspiredMode();
 
   const handleModeChange = async (value: string) => {
+    const targetMode = value as AICollaborationMode;
+
+    // Validate Inspired mode before switching
+    if (targetMode === "inspired" && !canActivateInspired) {
+      showError(
+        new Error(
+          validationReason ||
+            "Cannot activate Inspired mode. Please ensure Ollama is running and has models installed.",
+        ),
+      );
+      return;
+    }
+
     try {
-      await switchMode(value as AICollaborationMode);
+      await switchMode(targetMode);
     } catch (error) {
       // Error is handled by the hook
       console.error("Failed to switch mode:", error);
@@ -115,15 +132,23 @@ export function AICollaborationModeSelector() {
         </TooltipContent>
       </Tooltip>
       <SelectContent align="start" onCloseAutoFocus={(e) => e.preventDefault()}>
-        <SelectItem value="inspired">
+        <SelectItem value="inspired" disabled={!canActivateInspired}>
           <div className="flex flex-col items-start gap-1">
             <div className="flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
               <span className="font-medium">Inspired</span>
+              {!canActivateInspired && (
+                <AlertCircle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+              )}
             </div>
             <span className="text-xs text-muted-foreground">
               {getModeDescription("inspired")}
             </span>
+            {!canActivateInspired && validationReason && (
+              <span className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
+                {validationReason}
+              </span>
+            )}
             <div className="flex gap-1 mt-1">
               {getModeCapabilityBadges("inspired")?.map((badge) => (
                 <span

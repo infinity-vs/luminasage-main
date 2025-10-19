@@ -71,6 +71,7 @@ import { inArray } from "drizzle-orm";
 import { replacePromptReference } from "../utils/replacePromptReference";
 import { mcpManager } from "../utils/mcp_manager";
 import z from "zod";
+import { getModeAwareModel } from "../utils/mode_aware_routing";
 
 type AsyncIterableStream<T> = AsyncIterable<T> & ReadableStream<T>;
 
@@ -489,8 +490,16 @@ ${componentSnippet}
           "estimated tokens",
           codebaseInfo.length / 4,
         );
-        const { modelClient, isEngineEnabled } = await getModelClient(
+        
+        // Apply mode-aware model selection
+        const selectedModel = await getModeAwareModel(
           settings.selectedModel,
+          settings,
+        );
+        logger.log(`Using mode-aware model: ${selectedModel.provider}/${selectedModel.name}`);
+        
+        const { modelClient, isEngineEnabled } = await getModelClient(
+          selectedModel,
           settings,
           files,
         );
@@ -1017,8 +1026,14 @@ ${problemReport.problems
                     chatContext,
                     virtualFileSystem,
                   });
-                const { modelClient } = await getModelClient(
+                
+                // Apply mode-aware model selection for redo
+                const selectedRedoModel = await getModeAwareModel(
                   settings.selectedModel,
+                  settings,
+                );
+                const { modelClient } = await getModelClient(
+                  selectedRedoModel,
                   settings,
                   files,
                 );

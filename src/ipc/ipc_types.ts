@@ -577,3 +577,16 @@ export interface UpdateModeConfigurationParams {
   mode: AICollaborationMode;
   configuration: Record<string, unknown> | null;
 }
+
+// --- Inspired Mode Specific Types ---
+export interface InspiredModeStatus {
+  isOllamaAvailable: boolean;
+  availableModels: LocalModel[];
+  recommendedModel: string | null;
+  isOfflineCapable: boolean;
+}
+
+export interface InspiredModeValidation {
+  canActivate: boolean;
+  reason?: string;
+}

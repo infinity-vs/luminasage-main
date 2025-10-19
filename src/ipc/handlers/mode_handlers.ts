@@ -17,7 +17,14 @@ import type {
   UpdateModeConfigurationParams,
   ModeCapabilityDescriptor,
   ModeTransitionRecord,
+  InspiredModeStatus,
+  InspiredModeValidation,
 } from "../ipc_types";
+import {
+  checkInspiredModeStatus,
+  validateInspiredModeRequirements,
+  getBestOllamaModelForCoding,
+} from "../utils/inspired_mode_utils";
 
 const logger = log.scope("mode_handlers");
 const handle = createLoggedHandler(logger);
@@ -356,6 +363,32 @@ export function registerModeHandlers() {
         errorMessage: h.errorMessage,
         createdAt: h.createdAt.toISOString(),
       }));
+    },
+  );
+
+  // --- Inspired Mode Specific Handlers ---
+
+  // Get Inspired mode status (Ollama availability, models, etc.)
+  handle(
+    "mode:inspired:get-status",
+    async (): Promise<InspiredModeStatus> => {
+      return await checkInspiredModeStatus();
+    },
+  );
+
+  // Validate if Inspired mode can be activated
+  handle(
+    "mode:inspired:validate",
+    async (): Promise<InspiredModeValidation> => {
+      return await validateInspiredModeRequirements();
+    },
+  );
+
+  // Get the best Ollama model for coding
+  handle(
+    "mode:inspired:get-recommended-model",
+    async (): Promise<string | null> => {
+      return await getBestOllamaModelForCoding();
     },
   );
 }
