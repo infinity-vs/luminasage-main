@@ -61,10 +61,10 @@ const logger = log.scope("getModelClient");
 export async function getModelClient(
   model: LargeLanguageModel,
   settings: UserSettings,
-  files?: File[],
 ): Promise<{
   modelClient: ModelClient;
   isEngineEnabled?: boolean;
+  isSmartContextEnabled?: boolean;
 }> {
   const allProviders = await getLanguageModelProviders();
 
@@ -112,15 +112,14 @@ export async function getModelClient(
       // Do not use free variant (for openrouter).
       const modelName = model.name.split(":free")[0];
       const autoModelClient = {
-        model: provider(`${providerConfig.gatewayPrefix || ""}${modelName}`, {
-          files,
-        }),
+        model: provider(`${providerConfig.gatewayPrefix || ""}${modelName}`),
         builtinProviderId: model.provider,
       };
 
       return {
         modelClient: autoModelClient,
         isEngineEnabled: true,
+        isSmartContextEnabled: settings.enableProSmartFilesContextMode,
       };
     } else {
       logger.warn(
@@ -176,7 +175,6 @@ export async function getModelClient(
             name: autoModel.name,
           },
           settings,
-          files,
         );
       }
     }

@@ -440,16 +440,25 @@ ${componentSnippet}
         // Normal AI processing for non-test prompts
 
         const appPath = getDyadAppPath(updatedChat.app.path);
-        const chatContext = req.selectedComponent
-          ? {
+        let chatContext = validateChatContext(updatedChat.app.chatContext);
+
+        if (req.selectedComponent) {
+          if (isSmartContextEnabled) {
+            // Smart context is on: maintain full context but flag the file as focused.
+            // The actual focusing happens in `extractCodebase`.
+            // No need to modify chatContext here.
+          } else {
+            // Smart context is off: restrict context to just the selected file.
+            chatContext = {
               contextPaths: [
                 {
                   globPath: req.selectedComponent.relativePath,
                 },
               ],
               smartContextAutoIncludes: [],
-            }
-          : validateChatContext(updatedChat.app.chatContext);
+            };
+          }
+        }
 
         // Parse app mentions from the prompt
         const mentionedAppNames = parseAppMentions(req.prompt);
@@ -458,6 +467,8 @@ ${componentSnippet}
         const { formattedOutput: codebaseInfo, files } = await extractCodebase({
           appPath,
           chatContext,
+          selectedComponent: req.selectedComponent,
+          isSmartContextEnabled,
         });
 
         // Extract codebases for mentioned apps
@@ -498,11 +509,8 @@ ${componentSnippet}
         );
         logger.log(`Using mode-aware model: ${selectedModel.provider}/${selectedModel.name}`);
         
-        const { modelClient, isEngineEnabled } = await getModelClient(
-          selectedModel,
-          settings,
-          files,
-        );
+        const { modelClient, isEngineEnabled, isSmartContextEnabled } =
+          await getModelClient(selectedModel, settings);
 
         // Prepare message history for the AI
         const messageHistory = updatedChat.messages.map((message) => ({
@@ -718,12 +726,14 @@ This conversation includes one or more image attachments. When the user uploads 
           tools,
           systemPromptOverride = systemPrompt,
           dyadDisableFiles = false,
+          dyadFiles,
         }: {
           chatMessages: ModelMessage[];
           modelClient: ModelClient;
           tools?: ToolSet;
           systemPromptOverride?: string;
           dyadDisableFiles?: boolean;
+          dyadFiles?: { path: string; content: string }[];
         }) => {
           if (isEngineEnabled) {
             logger.log(
@@ -738,6 +748,7 @@ This conversation includes one or more image attachments. When the user uploads 
             "dyad-engine": {
               dyadRequestId,
               dyadDisableFiles,
+              dyadFiles,
               dyadMentionedApps: mentionedAppsCodebases.map(
                 ({ files, appName }) => ({
                   appName,
@@ -912,6 +923,7 @@ This conversation includes one or more image attachments. When the user uploads 
         const { fullStream } = await simpleStreamText({
           chatMessages,
           modelClient,
+          dyadFiles: files,
         });
 
         // Process the stream as before
@@ -1025,6 +1037,7 @@ ${problemReport.problems
                     appPath,
                     chatContext,
                     virtualFileSystem,
+                    isSmartContextEnabled,
                   });
                 
                 // Apply mode-aware model selection for redo
@@ -1035,11 +1048,11 @@ ${problemReport.problems
                 const { modelClient } = await getModelClient(
                   selectedRedoModel,
                   settings,
-                  files,
                 );
 
                 const { fullStream } = await simpleStreamText({
                   modelClient,
+                  dyadFiles: files,
                   chatMessages: [
                     ...chatMessages.map((msg, index) => {
                       if (
