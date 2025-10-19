@@ -19,12 +19,22 @@ import type {
   ModeTransitionRecord,
   InspiredModeStatus,
   InspiredModeValidation,
+  DidacticModeStatus,
+  DidacticModeValidation,
+  McpIntegrationStatus,
 } from "../ipc_types";
 import {
   checkInspiredModeStatus,
   validateInspiredModeRequirements,
   getBestOllamaModelForCoding,
 } from "../utils/inspired_mode_utils";
+import {
+  checkDidacticModeStatus,
+  validateDidacticModeRequirements,
+  getRecommendedExternalProvider,
+  checkMcpIntegration,
+} from "../utils/didactic_mode_utils";
+import { readSettings } from "../../main/settings";
 
 const logger = log.scope("mode_handlers");
 const handle = createLoggedHandler(logger);
@@ -389,6 +399,43 @@ export function registerModeHandlers() {
     "mode:inspired:get-recommended-model",
     async (): Promise<string | null> => {
       return await getBestOllamaModelForCoding();
+    },
+  );
+
+  // --- Didactic Mode Specific Handlers ---
+
+  // Get Didactic mode status (external AI availability, MCP servers, etc.)
+  handle(
+    "mode:didactic:get-status",
+    async (): Promise<DidacticModeStatus> => {
+      const settings = await readSettings();
+      return await checkDidacticModeStatus(settings);
+    },
+  );
+
+  // Validate if Didactic mode can be activated
+  handle(
+    "mode:didactic:validate",
+    async (): Promise<DidacticModeValidation> => {
+      const settings = await readSettings();
+      return await validateDidacticModeRequirements(settings);
+    },
+  );
+
+  // Get the recommended external provider for Didactic mode
+  handle(
+    "mode:didactic:get-recommended-provider",
+    async (): Promise<string | null> => {
+      const settings = await readSettings();
+      return await getRecommendedExternalProvider(settings);
+    },
+  );
+
+  // Get MCP integration status
+  handle(
+    "mode:didactic:get-mcp-status",
+    async (): Promise<McpIntegrationStatus> => {
+      return await checkMcpIntegration();
     },
   );
 }

@@ -12,6 +12,8 @@ import { eq } from "drizzle-orm";
 import type { AICollaborationMode } from "../ipc_types";
 import type { LargeLanguageModel, UserSettings } from "../../lib/schemas";
 import { checkInspiredModeStatus, getBestOllamaModelForCoding } from "./inspired_mode_utils";
+import { getRecommendedExternalProvider, getBestExternalModel } from "./didactic_mode_utils";
+import { readSettings } from "../../main/settings";
 
 const logger = log.scope("mode_aware_routing");
 
@@ -43,7 +45,7 @@ export async function getActiveCollaborationMode(): Promise<AICollaborationMode>
  */
 export async function getModeAwareModel(
   requestedModel: LargeLanguageModel,
-  settings: UserSettings,
+  _settings: UserSettings,
 ): Promise<LargeLanguageModel> {
   const activeMode = await getActiveCollaborationMode();
 
@@ -104,17 +106,29 @@ export async function getModeAwareModel(
           `Didactic mode does not support local model: ${requestedModel.provider}. Using external AI instead.`
         );
         
-        // Use the user's preferred external model or default
-        if (settings.selectedModel?.provider && 
-            settings.selectedModel.provider !== "ollama" && 
-            settings.selectedModel.provider !== "lmstudio") {
-          return settings.selectedModel;
+        // Get recommended external provider
+        const currentSettings = await readSettings();
+        const recommendedProvider = await getRecommendedExternalProvider(currentSettings);
+        
+        if (!recommendedProvider) {
+          throw new Error(
+            "No external AI providers configured for Didactic mode. Please add an API key in Settings."
+          );
         }
         
-        // Fall back to auto if no suitable model is configured
-        return { provider: "auto", name: "free" };
+        const recommendedModel = getBestExternalModel(recommendedProvider);
+        
+        logger.info(
+          `Didactic mode: Overriding to recommended external model: ${recommendedProvider}/${recommendedModel}`
+        );
+        
+        return {
+          provider: recommendedProvider,
+          name: recommendedModel,
+        };
       }
 
+      // If already an external model, use it
       logger.info("Didactic mode: Using external model", requestedModel);
       return requestedModel;
     }

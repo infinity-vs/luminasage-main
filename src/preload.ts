@@ -138,6 +138,11 @@ const validInvokeChannels = [
   "mode:inspired:get-status",
   "mode:inspired:validate",
   "mode:inspired:get-recommended-model",
+  // Didactic Mode
+  "mode:didactic:get-status",
+  "mode:didactic:validate",
+  "mode:didactic:get-recommended-provider",
+  "mode:didactic:get-mcp-status",
   // adding app to favorite
   "add-to-favorite",
   "github:clone-repo-from-url",

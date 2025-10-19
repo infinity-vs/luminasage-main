@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useAICollaborationMode } from "@/hooks/useAICollaborationMode";
 import { useInspiredMode } from "@/hooks/useInspiredMode";
+import { useDidacticMode } from "@/hooks/useDidacticMode";
 import type { AICollaborationMode } from "@/ipc/ipc_types";
 import { cn } from "@/lib/utils";
 import { Sparkles, BookOpen, Zap, AlertCircle } from "lucide-react";
@@ -20,8 +21,10 @@ import { showError } from "@/lib/toast";
 export function AICollaborationModeSelector() {
   const { currentMode, availableModes, switchMode, isSwitching } =
     useAICollaborationMode();
-  const { canActivate: canActivateInspired, validationReason } =
+  const { canActivate: canActivateInspired, validationReason: inspiredReason } =
     useInspiredMode();
+  const { canActivate: canActivateDidactic, validationReason: didacticReason } =
+    useDidacticMode();
 
   const handleModeChange = async (value: string) => {
     const targetMode = value as AICollaborationMode;
@@ -30,8 +33,19 @@ export function AICollaborationModeSelector() {
     if (targetMode === "inspired" && !canActivateInspired) {
       showError(
         new Error(
-          validationReason ||
+          inspiredReason ||
             "Cannot activate Inspired mode. Please ensure Ollama is running and has models installed.",
+        ),
+      );
+      return;
+    }
+
+    // Validate Didactic mode before switching
+    if (targetMode === "didactic" && !canActivateDidactic) {
+      showError(
+        new Error(
+          didacticReason ||
+            "Cannot activate Didactic mode. Please configure an external AI provider in Settings.",
         ),
       );
       return;
@@ -144,9 +158,9 @@ export function AICollaborationModeSelector() {
             <span className="text-xs text-muted-foreground">
               {getModeDescription("inspired")}
             </span>
-            {!canActivateInspired && validationReason && (
+            {!canActivateInspired && inspiredReason && (
               <span className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
-                {validationReason}
+                {inspiredReason}
               </span>
             )}
             <div className="flex gap-1 mt-1">
@@ -161,15 +175,23 @@ export function AICollaborationModeSelector() {
             </div>
           </div>
         </SelectItem>
-        <SelectItem value="didactic">
+        <SelectItem value="didactic" disabled={!canActivateDidactic}>
           <div className="flex flex-col items-start gap-1">
             <div className="flex items-center gap-1.5">
               <BookOpen className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
               <span className="font-medium">Didactic</span>
+              {!canActivateDidactic && (
+                <AlertCircle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+              )}
             </div>
             <span className="text-xs text-muted-foreground">
               {getModeDescription("didactic")}
             </span>
+            {!canActivateDidactic && didacticReason && (
+              <span className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
+                {didacticReason}
+              </span>
+            )}
             <div className="flex gap-1 mt-1">
               {getModeCapabilityBadges("didactic")?.map((badge) => (
                 <span

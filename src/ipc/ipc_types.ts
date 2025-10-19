@@ -590,3 +590,26 @@ export interface InspiredModeValidation {
   canActivate: boolean;
   reason?: string;
 }
+
+// --- Didactic Mode Specific Types ---
+export interface DidacticModeStatus {
+  hasExternalAI: boolean;
+  availableProviders: string[];
+  configuredProviders: string[];
+  mcpServersCount: number;
+  enabledMcpServersCount: number;
+  isReady: boolean;
+  issues: string[];
+}
+
+export interface DidacticModeValidation {
+  canActivate: boolean;
+  reason?: string;
+}
+
+export interface McpIntegrationStatus {
+  hasServers: boolean;
+  enabledCount: number;
+  totalCount: number;
+  recommendation?: string;
+}

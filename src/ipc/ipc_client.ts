@@ -77,6 +77,9 @@ import type {
   ModeTransitionRecord,
   InspiredModeStatus,
   InspiredModeValidation,
+  DidacticModeStatus,
+  DidacticModeValidation,
+  McpIntegrationStatus,
 } from "./ipc_types";
 import type { Template } from "../shared/templates";
 import type {
@@ -1327,6 +1330,23 @@ export class IpcClient {
 
   public async getRecommendedOllamaModel(): Promise<string | null> {
     return this.ipcRenderer.invoke("mode:inspired:get-recommended-model");
+  }
+
+  // --- Didactic Mode Specific Methods ---
+  public async getDidacticModeStatus(): Promise<DidacticModeStatus> {
+    return this.ipcRenderer.invoke("mode:didactic:get-status");
+  }
+
+  public async validateDidacticMode(): Promise<DidacticModeValidation> {
+    return this.ipcRenderer.invoke("mode:didactic:validate");
+  }
+
+  public async getRecommendedExternalProvider(): Promise<string | null> {
+    return this.ipcRenderer.invoke("mode:didactic:get-recommended-provider");
+  }
+
+  public async getMcpIntegrationStatus(): Promise<McpIntegrationStatus> {
+    return this.ipcRenderer.invoke("mode:didactic:get-mcp-status");
   }
 
   public async cloneRepoFromUrl(
