@@ -14,9 +14,7 @@ const logger = log.scope("llm_engine_provider");
 
 export type ExampleChatModelId = string & {};
 
-export interface ExampleChatSettings {
-  files?: { path: string; content: string }[];
-}
+export interface ExampleChatSettings {}
 export interface ExampleProviderSettings {
   /**
 Example API key.
@@ -110,9 +108,6 @@ export function createDyadEngine(
     modelId: ExampleChatModelId,
     settings: ExampleChatSettings = {},
   ) => {
-    // Extract files from settings to process them appropriately
-    const { files } = settings;
-
     // Create configuration with file handling
     const config = {
       ...getCommonModelConfig(),
@@ -146,6 +141,10 @@ export function createDyadEngine(
           if ("dyadMentionedApps" in parsedBody) {
             delete parsedBody.dyadMentionedApps;
           }
+          const dyadFiles = parsedBody.dyadFiles;
+          if ("dyadFiles" in parsedBody) {
+            delete parsedBody.dyadFiles;
+          }
 
           // Track and modify requestId with attempt number
           let modifiedRequestId = requestId;
@@ -156,9 +155,9 @@ export function createDyadEngine(
           }
 
           // Add files to the request if they exist
-          if (files?.length && !dyadDisableFiles) {
+          if (dyadFiles?.length && !dyadDisableFiles) {
             parsedBody.dyad_options = {
-              files,
+              files: dyadFiles,
               enable_lazy_edits: options.dyadOptions.enableLazyEdits,
               enable_smart_files_context:
                 options.dyadOptions.enableSmartFilesContext,

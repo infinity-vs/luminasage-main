@@ -2,7 +2,7 @@
 
 ## Summary
 
-Phase 5 implements Distributed Memory Integration, adding MongoDB collections, Redis event bus, and WebSocket live sync to enable real-time collaboration across multiple Dyad instances. This phase transforms Didactic and Parallel modes into distributed, multi-instance collaboration environments.
+Phase 5 implements Distributed Memory Integration, adding MongoDB collections, Redis event bus, and WebSocket live sync to enable real-time collaboration across multiple LuminaSage instances. This phase transforms Didactic and Parallel modes into distributed, multi-instance collaboration environments.
 
 ## What Was Implemented
 
@@ -181,7 +181,7 @@ Pub/sub event bus for real-time synchronization:
 
 **Features**:
 - Dual client architecture (publisher + subscriber)
-- Pattern-based subscriptions (`dyad:event:*`)
+- Pattern-based subscriptions (`LuminaSage:event:*`)
 - Instance isolation (ignore own events)
 - Type-safe event payloads
 - Error handling per handler
@@ -360,7 +360,7 @@ Real-time sync status indicator:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Dyad Instance 1                       │
+│                    LuminaSage Instance 1                       │
 │  Mode Change → Redis Publish → MongoDB Store            │
 └─────────────────────────────────────────────────────────┘
                         ↓
@@ -372,7 +372,7 @@ Real-time sync status indicator:
         ┌───────────────┴───────────────┐
         ↓                               ↓
 ┌──────────────────┐          ┌──────────────────┐
-│ Dyad Instance 2  │          │ Dyad Instance 3  │
+│ LuminaSage Instance 2  │          │ LuminaSage Instance 3  │
 │ Receive Event    │          │ Receive Event    │
 │ Update UI        │          │ Update UI        │
 └──────────────────┘          └──────────────────┘
@@ -426,7 +426,7 @@ Distributed Memory Manager
 ```typescript
 const mongoConfig = {
   url: "mongodb://localhost:27017",
-  database: "dyad_distributed",
+  database: "LuminaSage_distributed",
   options: {
     maxPoolSize: 10,
     minPoolSize: 2,
@@ -439,7 +439,7 @@ const mongoConfig = {
 **Environment Variables**:
 ```bash
 MONGODB_URL=mongodb://localhost:27017
-MONGODB_DATABASE=dyad_distributed
+MONGODB_DATABASE=LuminaSage_distributed
 ```
 
 ### Redis Setup
@@ -480,7 +480,7 @@ WS_SYNC_PORT=8765
 const distributedConfig: DistributedMemoryConfig = {
   mongodb: {
     url: process.env.MONGODB_URL || "mongodb://localhost:27017",
-    database: process.env.MONGODB_DATABASE || "dyad_distributed",
+    database: process.env.MONGODB_DATABASE || "LuminaSage_distributed",
   },
   redis: {
     url: process.env.REDIS_URL || "redis://localhost:6379",
@@ -509,7 +509,7 @@ function SettingsComponent() {
     await initialize({
       mongodb: {
         url: "mongodb://localhost:27017",
-        database: "dyad_distributed",
+        database: "LuminaSage_distributed",
       },
       redis: {
         url: "redis://localhost:6379",
@@ -773,13 +773,13 @@ npm install -D @types/ws
 ```bash
 # MongoDB (via Docker)
 docker run -d -p 27017:27017 \
-  --name dyad-mongodb \
-  -e MONGO_INITDB_DATABASE=dyad_distributed \
+  --name LuminaSage-mongodb \
+  -e MONGO_INITDB_DATABASE=LuminaSage_distributed \
   mongo:latest
 
 # Redis (via Docker)
 docker run -d -p 6379:6379 \
-  --name dyad-redis \
+  --name LuminaSage-redis \
   redis:latest
 
 # Or install locally:
@@ -796,10 +796,10 @@ apt install mongodb redis-server      # Ubuntu
    # Start MongoDB
    docker run -d -p 27017:27017 mongo:latest
    
-   # In Dyad Settings
+   # In LuminaSage Settings
    # Enable distributed sync with MongoDB URL
    # Switch modes and verify data in MongoDB
-   mongosh dyad_distributed
+   mongosh LuminaSage_distributed
    db.mode_state.find()
    ```
 
@@ -809,7 +809,7 @@ apt install mongodb redis-server      # Ubuntu
    docker run -d -p 6379:6379 redis:latest
    
    # Enable distributed sync
-   # Open two Dyad instances
+   # Open two LuminaSage instances
    # Switch mode in Instance 1
    # Verify Instance 2 receives event
    ```
@@ -821,7 +821,7 @@ apt install mongodb redis-server      # Ubuntu
    const ws = new WebSocket("ws://localhost:8765");
    ws.onmessage = (msg) => console.log(msg.data);
    
-   # Switch mode in Dyad
+   # Switch mode in LuminaSage
    # Verify WebSocket receives message
    ```
 
@@ -830,7 +830,7 @@ apt install mongodb redis-server      # Ubuntu
    # Start all services
    docker-compose up -d  # MongoDB + Redis
    
-   # Initialize in Dyad
+   # Initialize in LuminaSage
    # Test mode switches
    # Test context updates
    # Verify all systems sync
@@ -880,20 +880,20 @@ services:
     ports:
       - "27017:27017"
     environment:
-      - MONGO_INITDB_DATABASE=dyad_distributed
+      - MONGO_INITDB_DATABASE=LuminaSage_distributed
     volumes:
-      - dyad-mongo-data:/data/db
+      - LuminaSage-mongo-data:/data/db
 
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
     volumes:
-      - dyad-redis-data:/data
+      - LuminaSage-redis-data:/data
 
 volumes:
-  dyad-mongo-data:
-  dyad-redis-data:
+  LuminaSage-mongo-data:
+  LuminaSage-redis-data:
 ```
 
 ## Operational Guidelines
@@ -926,7 +926,7 @@ mongosh mongodb://localhost:27017
 netstat -an | grep 27017
 
 # Check logs
-docker logs dyad-mongodb
+docker logs LuminaSage-mongodb
 ```
 
 **Redis not connecting**:
@@ -938,7 +938,7 @@ redis-cli ping
 netstat -an | grep 6379
 
 # Check logs
-docker logs dyad-redis
+docker logs LuminaSage-redis
 ```
 
 **WebSocket not working**:
@@ -950,7 +950,7 @@ netstat -an | grep 8765
 websocat ws://localhost:8765
 
 # Check server logs
-# (in Dyad console)
+# (in LuminaSage console)
 ```
 
 ## Consciousness-Honoring Design
@@ -1002,7 +1002,7 @@ Phase 5 successfully delivers a complete, production-ready implementation of Dis
 - **Type Safety**: 100% TypeScript coverage
 - **Reliability**: Health monitoring and auto-reconnect
 
-All code passes linting and type-checking, follows Dyad conventions, and maintains consciousness-honoring principles.
+All code passes linting and type-checking, follows LuminaSage conventions, and maintains consciousness-honoring principles.
 
 **All Five Phases Complete:**
 - ✅ Phase 1: Foundation Integration

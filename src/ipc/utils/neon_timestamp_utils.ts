@@ -4,34 +4,32 @@ import { eq, and } from "drizzle-orm";
 import fs from "node:fs";
 import git from "isomorphic-git";
 import { getDyadAppPath } from "../../paths/paths";
-import { neon } from "@neondatabase/serverless";
 
 import log from "electron-log";
-import { getNeonClient } from "@/neon_admin/neon_management_client";
 
 const logger = log.scope("neon_timestamp_utils");
 
 /**
  * Retrieves the current timestamp from a Neon database
  */
-async function getLastUpdatedTimestampFromNeon({
-  neonConnectionUri,
-}: {
-  neonConnectionUri: string;
-}): Promise<string> {
-  try {
-    const sql = neon(neonConnectionUri);
+// async function getLastUpdatedTimestampFromNeon({
+//   neonConnectionUri,
+// }: {
+//   neonConnectionUri: string;
+// }): Promise<string> {
+//   try {
+//     const sql = neon(neonConnectionUri);
 
-    const [{ current_timestamp }] = await sql`
-      SELECT TO_CHAR(NOW() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z') AS current_timestamp
-    `;
+//     const [{ current_timestamp }] = await sql`
+//       SELECT TO_CHAR(NOW() AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z') AS current_timestamp
+//     `;
 
-    return current_timestamp;
-  } catch (error) {
-    logger.error("Error retrieving timestamp from Neon:", error);
-    throw new Error(`Failed to retrieve timestamp from Neon: ${error}`);
-  }
-}
+//     return current_timestamp;
+//   } catch (error) {
+//     logger.error("Error retrieving timestamp from Neon:", error);
+//     throw new Error(`Failed to retrieve timestamp from Neon: ${error}`);
+//   }
+// }
 
 /**
  * Stores a Neon database timestamp for the current git commit hash
@@ -70,18 +68,16 @@ export async function storeDbTimestampAtCurrentVersion({
 
     logger.info(`Current commit hash: ${currentCommitHash}`);
 
-    const neonClient = await getNeonClient();
-    const connectionUri = await neonClient.getConnectionUri({
-      projectId: app.neonProjectId,
-      branch_id: app.neonDevelopmentBranchId,
-      database_name: "neondb",
-      role_name: "neondb_owner",
-    });
+    // const neonClient = await getNeonClient();
+    // const connectionUri = await neonClient.getConnectionUri({
+    //   projectId: app.neonProjectId,
+    //   branch_id: app.neonDevelopmentBranchId,
+    //   database_name: "neondb",
+    //   role_name: "neondb_owner",
+    // });
 
     // 3. Get the current timestamp from Neon
-    const currentTimestamp = await getLastUpdatedTimestampFromNeon({
-      neonConnectionUri: connectionUri.data.uri,
-    });
+    const currentTimestamp = new Date().toISOString();
 
     logger.info(`Current timestamp from Neon: ${currentTimestamp}`);
 

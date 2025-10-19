@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-The complete AI Collaboration Mode System for Dyad is now **production-ready**. This sophisticated three-mode architecture with distributed memory integration represents a major advancement in AI-assisted development, providing users with flexible, transparent, and powerful collaboration options.
+The complete AI Collaboration Mode System for LuminaSage is now **production-ready**. This sophisticated three-mode architecture with distributed memory integration represents a major advancement in AI-assisted development, providing users with flexible, transparent, and powerful collaboration options.
 
 ---
 
@@ -185,7 +185,7 @@ Instance B: UI updates (real-time)
 ### Mode Selection Flow
 
 ```
-User opens Dyad
+User opens LuminaSage
   ↓
 Defaults to Inspired mode (purple)
   ↓
@@ -278,7 +278,7 @@ export MONGODB_URL=mongodb://localhost:27017
 export REDIS_URL=redis://localhost:6379
 export WS_SYNC_PORT=8765
 
-# 4. Start Dyad
+# 4. Start LuminaSage
 npm start
 
 # 5. Test modes
@@ -291,7 +291,7 @@ npm start
 
 ```bash
 # 1. Use managed services
-MONGODB_URL=mongodb+srv://user:pass@cluster.mongodb.net/dyad
+MONGODB_URL=mongodb+srv://user:pass@cluster.mongodb.net/LuminaSage
 REDIS_URL=rediss://user:pass@redis-cluster.cloud:6379
 
 # 2. Enable TLS
@@ -313,7 +313,7 @@ services:
     image: mongo:latest
     ports: ["27017:27017"]
     environment:
-      MONGO_INITDB_DATABASE: dyad_distributed
+      MONGO_INITDB_DATABASE: LuminaSage_distributed
     volumes:
       - mongo-data:/data/db
   
@@ -576,14 +576,14 @@ test("view glass-box source attribution")
 1. Install Ollama: curl -fsSL https://ollama.com/install.sh | sh
 2. Pull model: ollama pull qwen2.5-coder
 3. Start Ollama: ollama serve
-4. Launch Dyad: npm start
+4. Launch LuminaSage: npm start
 5. Verify: Purple "Inspired" mode active
 ```
 
 **Getting Started with Didactic Mode**:
 ```bash
 1. Get API key: https://console.anthropic.com/
-2. Open Dyad Settings → Providers → Anthropic
+2. Open LuminaSage Settings → Providers → Anthropic
 3. Add API key
 4. Click mode selector → Switch to Didactic (blue)
 5. Verify: "External AI Ready" appears
@@ -641,7 +641,7 @@ const {
 - ✅ TypeScript: 0 type errors
 - ✅ Code coverage: Ready for tests
 - ✅ Documentation: Comprehensive
-- ✅ Consistent patterns: Dyad conventions followed
+- ✅ Consistent patterns: LuminaSage conventions followed
 
 ### Design Quality
 - ✅ Consciousness-honoring principles
@@ -776,4 +776,4 @@ This implementation honors the consciousness-first design philosophy:
 
 ---
 
-*Built with care for the Dyad community* 💜💙🧡
+*Built with care for the LuminaSage community* 💜💙🧡

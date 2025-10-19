@@ -97,8 +97,8 @@ const config: ForgeConfig = {
       name: "@electron-forge/publisher-github",
       config: {
         repository: {
-          owner: "dyad-sh",
-          name: "dyad",
+          owner: "luminasage-sh",
+          name: "luminasage",
         },
         draft: true,
         force: true,

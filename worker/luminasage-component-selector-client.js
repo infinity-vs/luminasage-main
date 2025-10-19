@@ -1,5 +1,5 @@
 (() => {
-  const OVERLAY_ID = "__dyad_overlay__";
+  const OVERLAY_ID = "__luminasage_overlay__";
   let overlay, label;
 
   //detect if the user is using Mac
@@ -99,8 +99,8 @@
       label.appendChild(editLine);
     }
 
-    const name = el.dataset.dyadName || "<unknown>";
-    const file = (el.dataset.dyadId || "").split(":")[0];
+    const name = el.dataset.luminasageName || "<unknown>";
+    const file = (el.dataset.luminasageId || "").split(":")[0];
 
     const nameEl = document.createElement("div");
     nameEl.textContent = name;
@@ -119,7 +119,7 @@
     if (state.type !== "inspecting") return;
 
     let el = e.target;
-    while (el && !el.dataset.dyadId) el = el.parentElement;
+    while (el && !el.dataset.luminasageId) el = el.parentElement;
 
     if (state.element === el) return;
     state.element = el;
@@ -141,9 +141,9 @@
 
     window.parent.postMessage(
       {
-        type: "dyad-component-selected",
-        id: state.element.dataset.dyadId,
-        name: state.element.dataset.dyadName,
+        type: "luminasage-component-selected",
+        id: state.element.dataset.luminasageId,
+        name: state.element.dataset.luminasageName,
       },
       "*",
     );
@@ -167,7 +167,7 @@
       e.preventDefault();
       window.parent.postMessage(
         {
-          type: "dyad-select-component-shortcut",
+          type: "luminasage-select-component-shortcut",
         },
         "*",
       );
@@ -202,8 +202,8 @@
   /* ---------- message bridge -------------------------------------------- */
   window.addEventListener("message", (e) => {
     if (e.source !== window.parent) return;
-    if (e.data.type === "activate-dyad-component-selector") activate();
-    if (e.data.type === "deactivate-dyad-component-selector") deactivate();
+    if (e.data.type === "activate-luminasage-component-selector") activate();
+    if (e.data.type === "deactivate-luminasage-component-selector") deactivate();
   });
 
   // Always listen for keyboard shortcuts
@@ -212,22 +212,22 @@
   function initializeComponentSelector() {
     if (!document.body) {
       console.error(
-        "Dyad component selector initialization failed: document.body not found.",
+        "LuminaSage component selector initialization failed: document.body not found.",
       );
       return;
     }
     setTimeout(() => {
-      if (document.body.querySelector("[data-dyad-id]")) {
+      if (document.body.querySelector("[data-luminasage-id]")) {
         window.parent.postMessage(
           {
-            type: "dyad-component-selector-initialized",
+            type: "luminasage-component-selector-initialized",
           },
           "*",
         );
-        console.debug("Dyad component selector initialized");
+        console.debug("LuminaSage component selector initialized");
       } else {
         console.warn(
-          "Dyad component selector not initialized because no DOM elements were tagged",
+          "LuminaSage component selector not initialized because no DOM elements were tagged",
         );
       }
     }, 0);

@@ -120,6 +120,13 @@
       "when": 1760650342843,
       "tag": "0016_old_wild_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1760904090006,
+      "tag": "0017_friendly_blazing_skull",
+      "breakpoints": true
     }
   ]
 }

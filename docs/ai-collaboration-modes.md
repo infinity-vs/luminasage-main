@@ -2,7 +2,7 @@
 
 ## Overview
 
-The AI Collaboration Mode System introduces a sophisticated three-mode architecture for AI collaboration within Dyad. This system allows users to switch between different AI collaboration patterns based on their needs and preferences.
+The AI Collaboration Mode System introduces a sophisticated three-mode architecture for AI collaboration within LuminaSage. This system allows users to switch between different AI collaboration patterns based on their needs and preferences.
 
 ## Modes
 
@@ -49,7 +49,7 @@ The system uses three primary tables:
 
 ### IPC Communication
 
-Following Dyad's established IPC patterns:
+Following LuminaSage's established IPC patterns:
 
 **Handlers**: `src/ipc/handlers/mode_handlers.ts`
 

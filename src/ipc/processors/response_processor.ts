@@ -9,12 +9,6 @@ import { safeJoin } from "../utils/path_utils";
 
 import log from "electron-log";
 import { executeAddDependency } from "./executeAddDependency";
-import {
-  deleteSupabaseFunction,
-  deploySupabaseFunctions,
-  executeSupabaseSql,
-} from "../../supabase_admin/supabase_management_client";
-import { isServerFunction } from "../../supabase_admin/supabase_utils";
 import { UserSettings } from "../../lib/schemas";
 import { gitCommit } from "../utils/git_utils";
 import { readSettings } from "@/main/settings";
@@ -133,39 +127,39 @@ export async function processFullResponseActions(
     }
 
     // Handle SQL execution tags
-    if (dyadExecuteSqlQueries.length > 0) {
-      for (const query of dyadExecuteSqlQueries) {
-        try {
-          await executeSupabaseSql({
-            supabaseProjectId: chatWithApp.app.supabaseProjectId!,
-            query: query.content,
-          });
+    // if (dyadExecuteSqlQueries.length > 0) {
+    //   for (const query of dyadExecuteSqlQueries) {
+    //     try {
+    //       await executeSupabaseSql({
+    //         supabaseProjectId: chatWithApp.app.supabaseProjectId!,
+    //         query: query.content,
+    //       });
 
-          // Only write migration file if SQL execution succeeded
-          if (settings.enableSupabaseWriteSqlMigration) {
-            try {
-              const migrationFilePath = await writeMigrationFile(
-                appPath,
-                query.content,
-                query.description,
-              );
-              writtenFiles.push(migrationFilePath);
-            } catch (error) {
-              errors.push({
-                message: `Failed to write SQL migration file for: ${query.description}`,
-                error: error,
-              });
-            }
-          }
-        } catch (error) {
-          errors.push({
-            message: `Failed to execute SQL query: ${query.content}`,
-            error: error,
-          });
-        }
-      }
-      logger.log(`Executed ${dyadExecuteSqlQueries.length} SQL queries`);
-    }
+    //       // Only write migration file if SQL execution succeeded
+    //       if (settings.enableSupabaseWriteSqlMigration) {
+    //         try {
+    //           const migrationFilePath = await writeMigrationFile(
+    //             appPath,
+    //             query.content,
+    //             query.description,
+    //           );
+    //           writtenFiles.push(migrationFilePath);
+    //         } catch (error) {
+    //           errors.push({
+    //             message: `Failed to write SQL migration file for: ${query.description}`,
+    //             error: error,
+    //           });
+    //         }
+    //       }
+    //     } catch (error) {
+    //       errors.push({
+    //         message: `Failed to execute SQL query: ${query.content}`,
+    //         error: error,
+    //       });
+    //     }
+    //   }
+    //   logger.log(`Executed ${dyadExecuteSqlQueries.length} SQL queries`);
+    // }
 
     // TODO: Handle add dependency tags
     if (dyadAddDependencyPackages.length > 0) {
@@ -234,19 +228,19 @@ export async function processFullResponseActions(
       } else {
         logger.warn(`File to delete does not exist: ${fullFilePath}`);
       }
-      if (isServerFunction(filePath)) {
-        try {
-          await deleteSupabaseFunction({
-            supabaseProjectId: chatWithApp.app.supabaseProjectId!,
-            functionName: getFunctionNameFromPath(filePath),
-          });
-        } catch (error) {
-          errors.push({
-            message: `Failed to delete Supabase function: ${filePath}`,
-            error: error,
-          });
-        }
-      }
+      // if (isServerFunction(filePath)) {
+      //   try {
+      //     await deleteSupabaseFunction({
+      //       supabaseProjectId: chatWithApp.app.supabaseProjectId!,
+      //       functionName: getFunctionNameFromPath(filePath),
+      //     });
+      //   } catch (error) {
+      //     errors.push({
+      //       message: `Failed to delete Supabase function: ${filePath}`,
+      //       error: error,
+      //     });
+      //   }
+      // }
     }
 
     // Process all file renames
@@ -283,33 +277,33 @@ export async function processFullResponseActions(
       } else {
         logger.warn(`Source file for rename does not exist: ${fromPath}`);
       }
-      if (isServerFunction(tag.from)) {
-        try {
-          await deleteSupabaseFunction({
-            supabaseProjectId: chatWithApp.app.supabaseProjectId!,
-            functionName: getFunctionNameFromPath(tag.from),
-          });
-        } catch (error) {
-          warnings.push({
-            message: `Failed to delete Supabase function: ${tag.from} as part of renaming ${tag.from} to ${tag.to}`,
-            error: error,
-          });
-        }
-      }
-      if (isServerFunction(tag.to)) {
-        try {
-          await deploySupabaseFunctions({
-            supabaseProjectId: chatWithApp.app.supabaseProjectId!,
-            functionName: getFunctionNameFromPath(tag.to),
-            content: await readFileFromFunctionPath(toPath),
-          });
-        } catch (error) {
-          errors.push({
-            message: `Failed to deploy Supabase function: ${tag.to} as part of renaming ${tag.from} to ${tag.to}`,
-            error: error,
-          });
-        }
-      }
+      // if (isServerFunction(tag.from)) {
+      //   try {
+      //     await deleteSupabaseFunction({
+      //       supabaseProjectId: chatWithApp.app.supabaseProjectId!,
+      //       functionName: getFunctionNameFromPath(tag.from),
+      //     });
+      //   } catch (error) {
+      //     warnings.push({
+      //       message: `Failed to delete Supabase function: ${tag.from} as part of renaming ${tag.from} to ${tag.to}`,
+      //       error: error,
+      //     });
+      //   }
+      // }
+      // if (isServerFunction(tag.to)) {
+      //   try {
+      //     await deploySupabaseFunctions({
+      //       supabaseProjectId: chatWithApp.app.supabaseProjectId!,
+      //       functionName: getFunctionNameFromPath(tag.to),
+      //       content: await readFileFromFunctionPath(toPath),
+      //     });
+      //   } catch (error) {
+      //     errors.push({
+      //       message: `Failed to deploy Supabase function: ${tag.to} as part of renaming ${tag.from} to ${tag.to}`,
+      //       error: error,
+      //     });
+      //   }
+      // }
     }
 
     // Process all file writes
@@ -350,20 +344,20 @@ export async function processFullResponseActions(
       fs.writeFileSync(fullFilePath, content);
       logger.log(`Successfully wrote file: ${fullFilePath}`);
       writtenFiles.push(filePath);
-      if (isServerFunction(filePath) && typeof content === "string") {
-        try {
-          await deploySupabaseFunctions({
-            supabaseProjectId: chatWithApp.app.supabaseProjectId!,
-            functionName: path.basename(path.dirname(filePath)),
-            content: content,
-          });
-        } catch (error) {
-          errors.push({
-            message: `Failed to deploy Supabase function: ${filePath}`,
-            error: error,
-          });
-        }
-      }
+      // if (isServerFunction(filePath) && typeof content === "string") {
+      //   try {
+      //     await deploySupabaseFunctions({
+      //       supabaseProjectId: chatWithApp.app.supabaseProjectId!,
+      //       functionName: path.basename(path.dirname(filePath)),
+      //       content: content,
+      //     });
+      //   } catch (error) {
+      //     errors.push({
+      //       message: `Failed to deploy Supabase function: ${filePath}`,
+      //       error: error,
+      //     });
+      //   }
+      // }
     }
 
     // If we have any file changes, commit them all at once
