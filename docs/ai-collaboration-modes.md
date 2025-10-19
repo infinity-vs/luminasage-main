@@ -188,8 +188,8 @@ const { currentMode } = useAICollaborationMode();
 - [x] Consciousness-honoring polish (throughout)
 - [x] Type safety (100% coverage)
 - [x] Documentation completion (comprehensive)
-- [ ] End-to-end testing suite
-- [ ] Production deployment guide
+- [x] End-to-end testing suite
+- [x] Production deployment guide
 
 ## Testing
 
@@ -212,3 +212,5 @@ npm test mode
 - Design Document: See project root for full design specification
 - MCP Integration: `docs/mcp-integration.md`
 - IPC Patterns: See `.cursor/` rules directory
+- End-to-End Testing: `docs/end-to-end-testing.md`
+- Production Deployment: `docs/production-deployment.md`

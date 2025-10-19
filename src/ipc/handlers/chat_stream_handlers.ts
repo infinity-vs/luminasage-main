@@ -504,7 +504,7 @@ ${componentSnippet}
           settings,
         );
         logger.log(`Using mode-aware model: ${selectedModel.provider}/${selectedModel.name}`);
-        
+
         const { modelClient, isEngineEnabled, isSmartContextEnabled } =
           await getModelClient(selectedModel, settings);
 
