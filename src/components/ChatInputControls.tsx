@@ -5,6 +5,7 @@ import { ChatModeSelector } from "./ChatModeSelector";
 import { AICollaborationModeSelector } from "./AICollaborationModeSelector";
 import { InspiredModeIndicator } from "./InspiredModeIndicator";
 import { DidacticModeIndicator } from "./DidacticModeIndicator";
+import { ParallelModeIndicator } from "./ParallelModeIndicator";
 import { McpToolsPicker } from "@/components/McpToolsPicker";
 import { useSettings } from "@/hooks/useSettings";
 import { useAICollaborationMode } from "@/hooks/useAICollaborationMode";
@@ -29,6 +30,12 @@ export function ChatInputControls({
       {currentMode === "didactic" && (
         <>
           <DidacticModeIndicator />
+          <div className="w-1"></div>
+        </>
+      )}
+      {currentMode === "parallel" && (
+        <>
+          <ParallelModeIndicator />
           <div className="w-1"></div>
         </>
       )}

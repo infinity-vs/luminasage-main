@@ -13,6 +13,7 @@ import {
 import { useAICollaborationMode } from "@/hooks/useAICollaborationMode";
 import { useInspiredMode } from "@/hooks/useInspiredMode";
 import { useDidacticMode } from "@/hooks/useDidacticMode";
+import { useParallelMode } from "@/hooks/useParallelMode";
 import type { AICollaborationMode } from "@/ipc/ipc_types";
 import { cn } from "@/lib/utils";
 import { Sparkles, BookOpen, Zap, AlertCircle } from "lucide-react";
@@ -25,6 +26,8 @@ export function AICollaborationModeSelector() {
     useInspiredMode();
   const { canActivate: canActivateDidactic, validationReason: didacticReason } =
     useDidacticMode();
+  const { canActivate: canActivateParallel, validationReason: parallelReason } =
+    useParallelMode();
 
   const handleModeChange = async (value: string) => {
     const targetMode = value as AICollaborationMode;
@@ -46,6 +49,17 @@ export function AICollaborationModeSelector() {
         new Error(
           didacticReason ||
             "Cannot activate Didactic mode. Please configure an external AI provider in Settings.",
+        ),
+      );
+      return;
+    }
+
+    // Validate Parallel mode before switching
+    if (targetMode === "parallel" && !canActivateParallel) {
+      showError(
+        new Error(
+          parallelReason ||
+            "Cannot activate Parallel mode. Please configure at least one AI source.",
         ),
       );
       return;
@@ -204,15 +218,23 @@ export function AICollaborationModeSelector() {
             </div>
           </div>
         </SelectItem>
-        <SelectItem value="parallel">
+        <SelectItem value="parallel" disabled={!canActivateParallel}>
           <div className="flex flex-col items-start gap-1">
             <div className="flex items-center gap-1.5">
               <Zap className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
               <span className="font-medium">Parallel</span>
+              {!canActivateParallel && (
+                <AlertCircle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+              )}
             </div>
             <span className="text-xs text-muted-foreground">
               {getModeDescription("parallel")}
             </span>
+            {!canActivateParallel && parallelReason && (
+              <span className="text-[10px] text-amber-600 dark:text-amber-400 mt-0.5">
+                {parallelReason}
+              </span>
+            )}
             <div className="flex gap-1 mt-1">
               {getModeCapabilityBadges("parallel")?.map((badge) => (
                 <span

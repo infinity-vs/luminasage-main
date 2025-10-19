@@ -80,6 +80,11 @@ import type {
   DidacticModeStatus,
   DidacticModeValidation,
   McpIntegrationStatus,
+  ParallelModeStatus,
+  ParallelModeValidation,
+  ParallelModeStrategy,
+  AISource,
+  McpCoordinatorStatus,
 } from "./ipc_types";
 import type { Template } from "../shared/templates";
 import type {
@@ -1347,6 +1352,27 @@ export class IpcClient {
 
   public async getMcpIntegrationStatus(): Promise<McpIntegrationStatus> {
     return this.ipcRenderer.invoke("mode:didactic:get-mcp-status");
+  }
+
+  // --- Parallel Mode Specific Methods ---
+  public async getParallelModeStatus(): Promise<ParallelModeStatus> {
+    return this.ipcRenderer.invoke("mode:parallel:get-status");
+  }
+
+  public async validateParallelMode(): Promise<ParallelModeValidation> {
+    return this.ipcRenderer.invoke("mode:parallel:validate");
+  }
+
+  public async getParallelModeStrategy(): Promise<ParallelModeStrategy> {
+    return this.ipcRenderer.invoke("mode:parallel:get-strategy");
+  }
+
+  public async getAvailableAISources(): Promise<AISource[]> {
+    return this.ipcRenderer.invoke("mode:parallel:get-sources");
+  }
+
+  public async getMcpCoordinatorStatus(): Promise<McpCoordinatorStatus> {
+    return this.ipcRenderer.invoke("mode:parallel:get-mcp-coordinator-status");
   }
 
   public async cloneRepoFromUrl(

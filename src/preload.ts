@@ -143,6 +143,12 @@ const validInvokeChannels = [
   "mode:didactic:validate",
   "mode:didactic:get-recommended-provider",
   "mode:didactic:get-mcp-status",
+  // Parallel Mode
+  "mode:parallel:get-status",
+  "mode:parallel:validate",
+  "mode:parallel:get-strategy",
+  "mode:parallel:get-sources",
+  "mode:parallel:get-mcp-coordinator-status",
   // adding app to favorite
   "add-to-favorite",
   "github:clone-repo-from-url",

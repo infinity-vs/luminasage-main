@@ -22,6 +22,11 @@ import type {
   DidacticModeStatus,
   DidacticModeValidation,
   McpIntegrationStatus,
+  ParallelModeStatus,
+  ParallelModeValidation,
+  ParallelModeStrategy,
+  AISource,
+  McpCoordinatorStatus,
 } from "../ipc_types";
 import {
   checkInspiredModeStatus,
@@ -34,6 +39,13 @@ import {
   getRecommendedExternalProvider,
   checkMcpIntegration,
 } from "../utils/didactic_mode_utils";
+import {
+  checkParallelModeStatus,
+  validateParallelModeRequirements,
+  determineParallelStrategy,
+  getAvailableAISources,
+} from "../utils/parallel_mode_utils";
+import { multiMcpCoordinator } from "../utils/multi_mcp_coordinator";
 import { readSettings } from "../../main/settings";
 
 const logger = log.scope("mode_handlers");
@@ -436,6 +448,52 @@ export function registerModeHandlers() {
     "mode:didactic:get-mcp-status",
     async (): Promise<McpIntegrationStatus> => {
       return await checkMcpIntegration();
+    },
+  );
+
+  // --- Parallel Mode Specific Handlers ---
+
+  // Get Parallel mode status (local + external AI availability)
+  handle(
+    "mode:parallel:get-status",
+    async (): Promise<ParallelModeStatus> => {
+      const settings = await readSettings();
+      return await checkParallelModeStatus(settings);
+    },
+  );
+
+  // Validate if Parallel mode can be activated
+  handle(
+    "mode:parallel:validate",
+    async (): Promise<ParallelModeValidation> => {
+      const settings = await readSettings();
+      return await validateParallelModeRequirements(settings);
+    },
+  );
+
+  // Get Parallel mode strategy (which AI sources to use)
+  handle(
+    "mode:parallel:get-strategy",
+    async (): Promise<ParallelModeStrategy> => {
+      const settings = await readSettings();
+      return await determineParallelStrategy(settings);
+    },
+  );
+
+  // Get available AI sources
+  handle(
+    "mode:parallel:get-sources",
+    async (): Promise<AISource[]> => {
+      const settings = await readSettings();
+      return await getAvailableAISources(settings);
+    },
+  );
+
+  // Get multi-MCP coordinator status
+  handle(
+    "mode:parallel:get-mcp-coordinator-status",
+    async (): Promise<McpCoordinatorStatus> => {
+      return await multiMcpCoordinator.getStatus();
     },
   );
 }

@@ -613,3 +613,45 @@ export interface McpIntegrationStatus {
   totalCount: number;
   recommendation?: string;
 }
+
+// --- Parallel Mode Specific Types ---
+export interface ParallelModeStatus {
+  hasLocalAI: boolean;
+  hasExternalAI: boolean;
+  localModels: number;
+  externalProviders: number;
+  mcpServersEnabled: number;
+  isReady: boolean;
+  issues: string[];
+}
+
+export interface ParallelModeValidation {
+  canActivate: boolean;
+  reason?: string;
+}
+
+export interface AISource {
+  type: "local" | "external";
+  provider: string;
+  model: string;
+  isAvailable: boolean;
+}
+
+export interface ParallelModeStrategy {
+  primary: AISource;
+  secondary?: AISource;
+  useGlassBox: boolean;
+  enableHarmonization: boolean;
+  conflictResolution: "primary-wins" | "merge" | "vote";
+}
+
+export interface McpCoordinatorStatus {
+  enabledServers: Array<{
+    id: number;
+    name: string;
+    enabled: boolean;
+    toolCount?: number;
+  }>;
+  totalTools: number;
+  isReady: boolean;
+}
