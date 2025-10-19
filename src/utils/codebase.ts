@@ -407,6 +407,7 @@ export type CodebaseFile = {
   path: string;
   content: string;
   force?: boolean;
+  focused?: boolean;
 };
 
 /**
@@ -419,18 +420,18 @@ export async function extractCodebase({
   appPath,
   chatContext,
   virtualFileSystem,
+  selectedComponent,
+  isSmartContextEnabled,
 }: {
   appPath: string;
-  chatContext: AppChatContext;
+  chatContext: AppChatСontext;
   virtualFileSystem?: AsyncVirtualFileSystem;
+  selectedComponent?: { relativePath: string };
+  isSmartContextEnabled?: boolean;
 }): Promise<{
   formattedOutput: string;
   files: CodebaseFile[];
 }> {
-  const settings = readSettings();
-  const isSmartContextEnabled =
-    settings?.enableDyadPro && settings?.enableProSmartFilesContextMode;
-
   try {
     await fsAsync.access(appPath);
   } catch {
@@ -566,6 +567,10 @@ export async function extractCodebase({
       autoIncludedFiles.has(path.normalize(file)) &&
       !excludedFiles.has(path.normalize(file));
 
+    const isFocused =
+      isSmartContextEnabled &&
+      selectedComponent?.relativePath === normalizedRelativePath;
+
     // Determine file content based on whether we should read it
     let fileContent: string;
     if (
@@ -584,6 +589,7 @@ export async function extractCodebase({
       path: normalizedRelativePath,
       content: fileContent,
       force: isForced,
+      focused: isFocused,
     });
 
     return formattedContent;
